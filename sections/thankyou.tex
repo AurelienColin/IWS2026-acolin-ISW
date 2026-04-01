@@ -1,0 +1,27 @@
+% Closing / Thank you slide
+{
+\setbeamercolor{background canvas}{bg=CLSBlue}
+\begin{frame}[plain, noframenumbering]
+  \begin{tikzpicture}[remember picture, overlay]
+    % Gradient background
+    \fill[left color=CLSGradientBlue, right color=CLSGradientGreen]
+      (current page.north west) rectangle (current page.south east);
+
+    % Thank you text
+    \node[font=\fontsize{36}{44}\selectfont\bfseries, text=white]
+      at ([yshift=0.5cm]current page.center)
+      {Thank you};
+
+    % Contact information
+    \node[font=\normalsize, text=white, text width=8cm, align=center]
+      at ([yshift=-1.2cm]current page.center)
+      {author@cls.fr\\[4pt]
+       CLS -- Collecte Localisation Satellites\\
+       Toulouse, France};
+
+    % CLS logo
+    \node[anchor=south] at ([yshift=0.5cm]current page.south)
+      {\includegraphics[height=1.5cm]{images/cls_logo.png}};
+  \end{tikzpicture}
+\end{frame}
+}

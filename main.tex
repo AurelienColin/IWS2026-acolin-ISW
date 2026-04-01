@@ -1,0 +1,92 @@
+% CLS LaTeX Beamer Presentation Template (2026)
+% Compile with: make pdf
+
+\documentclass[aspectratio=169]{beamer}
+
+\usepackage{beamerthemeCLS}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{hyperref}
+
+% ---------------------------------------------------------------------------
+% Code listing style
+% ---------------------------------------------------------------------------
+\lstdefinestyle{clscode}{
+  backgroundcolor=\color{CLSLightGray},
+  basicstyle=\ttfamily\scriptsize,
+  keywordstyle=\color{CLSBlue}\bfseries,
+  commentstyle=\color{CLSTeal}\itshape,
+  stringstyle=\color{CLSRed},
+  numberstyle=\tiny\color{CLSDarkGray},
+  numbers=left,
+  numbersep=5pt,
+  frame=single,
+  rulecolor=\color{CLSBlue!30},
+  breaklines=true,
+  showstringspaces=false,
+  tabsize=4,
+}
+\lstset{style=clscode}
+
+% ---------------------------------------------------------------------------
+% Presentation metadata
+% ---------------------------------------------------------------------------
+\title{Presentation Title}
+\subtitle{Subtitle or Conference Name}
+\author{Author Name}
+\institute{CLS -- Collecte Localisation Satellites}
+\date{April 2026}
+
+% Partner logos (displayed top-right on title page)
+% Add your partner logos here, e.g.:
+%   \partnerlogos{\includegraphics[height=1.2cm]{images/partner1.png}%
+%                 \hspace{0.5cm}\includegraphics[height=1.2cm]{images/partner2.png}}
+\partnerlogos{%
+  \hspace{0.5cm}%
+  \raisebox{0.1cm}{\fcolorbox{CLSDarkGray}{white}{%
+    \parbox[c][1.1cm]{1.8cm}{\centering\tiny\color{CLSDarkGray}Partner 1}}}%
+  \hspace{0.3cm}%
+  \raisebox{0.1cm}{\fcolorbox{CLSDarkGray}{white}{%
+    \parbox[c][1.1cm]{1.8cm}{\centering\tiny\color{CLSDarkGray}Partner 2}}}%
+}
+
+% ===================================================================
+\begin{document}
+
+\input{sections/title}
+
+\input{sections/outline}
+
+% ===================================================================
+\section{Introduction}
+% ===================================================================
+
+\input{sections/motivation}
+
+% ===================================================================
+\section{Methodology}
+% ===================================================================
+
+\input{sections/data_and_methods}
+
+\input{sections/geophysical_model_function}
+
+% ===================================================================
+\section{Results}
+% ===================================================================
+
+\input{sections/results}
+
+\input{sections/code_example}
+
+% ===================================================================
+\section{Conclusion}
+% ===================================================================
+
+\input{sections/summary}
+
+\input{sections/thankyou}
+
+\end{document}

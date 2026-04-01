@@ -1,0 +1,28 @@
+% Two-column layout: text + figure
+\begin{frame}{Data and Methods}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{itemize}
+        \item Sentinel-1 SAR acquisitions
+        \item Co-located in situ measurements
+        \item Geophysical model functions
+        \item Machine learning retrieval
+      \end{itemize}
+
+      \vspace{0.5em}
+
+      \begin{block}{Key Parameter}
+        Wind speed retrieval accuracy target: $< 1.5$~m/s RMSE
+      \end{block}
+    \end{column}
+
+    \begin{column}{0.48\textwidth}
+      % Replace with your figure
+      \begin{tikzpicture}
+        \fill[CLSLightGray, rounded corners=4pt] (0,0) rectangle (5,3.5);
+        \node[text=CLSDarkGray, font=\small] at (2.5,1.75)
+          {Figure placeholder};
+      \end{tikzpicture}
+    \end{column}
+  \end{columns}
+\end{frame}

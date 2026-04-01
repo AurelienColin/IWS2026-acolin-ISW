@@ -1,0 +1,252 @@
+% beamerthemeCLS.sty — CLS Corporate Beamer Theme (2026)
+% Reverse-engineered from CLS PowerPoint template "Personnalise 13"
+% Self-contained: no external theme dependencies beyond standard LaTeX packages
+
+\ProvidesPackage{beamerthemeCLS}[2026/04/01 CLS Corporate Beamer Theme]
+
+% ---------------------------------------------------------------------------
+% Required packages
+% ---------------------------------------------------------------------------
+\RequirePackage{tikz}
+\RequirePackage{graphicx}
+\RequirePackage{calc}
+\RequirePackage{etoolbox}
+\RequirePackage{tgheros}          % TeX Gyre Heros (Franklin Gothic Book substitute)
+
+\usetikzlibrary{fadings}
+
+% ---------------------------------------------------------------------------
+% Font configuration
+% ---------------------------------------------------------------------------
+\renewcommand{\familydefault}{\sfdefault}
+
+% ---------------------------------------------------------------------------
+% CLS Color Palette
+% ---------------------------------------------------------------------------
+\definecolor{CLSRed}{HTML}{F02D42}
+\definecolor{CLSTeal}{HTML}{29AEA3}
+\definecolor{CLSBlue}{HTML}{0C71A8}
+\definecolor{CLSGreen}{HTML}{39CC96}
+\definecolor{CLSLightBlue}{HTML}{1087C9}
+\definecolor{CLSLimeGreen}{HTML}{A2CD3A}
+\definecolor{CLSDarkGray}{HTML}{575757}
+\definecolor{CLSBlack}{HTML}{000000}
+\definecolor{CLSWhite}{HTML}{FFFFFF}
+
+% Gradient endpoints (from PPTX decorative shapes)
+\definecolor{CLSGradientBlue}{HTML}{0B6FA8}
+\definecolor{CLSGradientGreen}{HTML}{39CD93}
+
+% Light background for header bar
+\definecolor{CLSLightGray}{HTML}{F5F5F5}
+
+% ---------------------------------------------------------------------------
+% Beamer color assignments
+% ---------------------------------------------------------------------------
+\setbeamercolor{normal text}{fg=CLSDarkGray, bg=CLSWhite}
+\setbeamercolor{structure}{fg=CLSBlue}
+\setbeamercolor{alerted text}{fg=CLSRed}
+\setbeamercolor{example text}{fg=CLSTeal}
+
+\setbeamercolor{frametitle}{fg=CLSBlue, bg=CLSWhite}
+\setbeamercolor{framesubtitle}{fg=CLSDarkGray}
+
+\setbeamercolor{title}{fg=CLSWhite}
+\setbeamercolor{subtitle}{fg=CLSWhite}
+\setbeamercolor{author}{fg=CLSWhite}
+\setbeamercolor{date}{fg=CLSWhite}
+\setbeamercolor{institute}{fg=CLSWhite}
+
+\setbeamercolor{block title}{fg=CLSWhite, bg=CLSBlue}
+\setbeamercolor{block body}{fg=CLSDarkGray, bg=CLSLightGray}
+\setbeamercolor{block title alerted}{fg=CLSWhite, bg=CLSRed}
+\setbeamercolor{block body alerted}{fg=CLSDarkGray, bg=CLSLightGray}
+\setbeamercolor{block title example}{fg=CLSWhite, bg=CLSTeal}
+\setbeamercolor{block body example}{fg=CLSDarkGray, bg=CLSLightGray}
+
+\setbeamercolor{item}{fg=CLSBlue}
+\setbeamercolor{subitem}{fg=CLSTeal}
+\setbeamercolor{subsubitem}{fg=CLSGreen}
+
+\setbeamercolor{section in toc}{fg=CLSBlue}
+\setbeamercolor{subsection in toc}{fg=CLSDarkGray}
+
+\setbeamercolor{footline}{fg=CLSWhite}
+\setbeamercolor{page number in head/foot}{fg=CLSDarkGray}
+
+% ---------------------------------------------------------------------------
+% Beamer font assignments
+% ---------------------------------------------------------------------------
+\setbeamerfont{title}{size=\Large, series=\bfseries}
+\setbeamerfont{subtitle}{size=\normalsize}
+\setbeamerfont{author}{size=\normalsize}
+\setbeamerfont{date}{size=\small}
+\setbeamerfont{institute}{size=\small}
+\setbeamerfont{frametitle}{size=\large, series=\bfseries}
+\setbeamerfont{framesubtitle}{size=\normalsize}
+\setbeamerfont{section title}{size=\Large, series=\bfseries}
+\setbeamerfont{footline}{size=\tiny}
+\setbeamerfont{page number in head/foot}{size=\scriptsize}
+
+% ---------------------------------------------------------------------------
+% Remove default navigation symbols
+% ---------------------------------------------------------------------------
+\setbeamertemplate{navigation symbols}{}
+
+% ---------------------------------------------------------------------------
+% Itemize / enumerate markers
+% ---------------------------------------------------------------------------
+\setbeamertemplate{itemize item}{\color{CLSBlue}\raisebox{0.15ex}{\small$\bullet$}}
+\setbeamertemplate{itemize subitem}{\color{CLSTeal}\raisebox{0.15ex}{\scriptsize$\bullet$}}
+\setbeamertemplate{itemize subsubitem}{\color{CLSGreen}\raisebox{0.15ex}{\scriptsize$\circ$}}
+
+% ---------------------------------------------------------------------------
+% Partner logos command (displayed on title page, right half)
+% Usage: \partnerlogos{\includegraphics[height=1.2cm]{img/partner1.png}\hspace{0.5cm}...}
+% ---------------------------------------------------------------------------
+\makeatletter
+\newcommand{\partnerlogos}[1]{\def\@partnerlogos{#1}}
+\partnerlogos{}  % default: empty
+\makeatother
+
+% ---------------------------------------------------------------------------
+% Title page template
+% ---------------------------------------------------------------------------
+\makeatletter
+\setbeamertemplate{title page}{%
+  \begin{tikzpicture}[remember picture, overlay]
+    % Blue-to-green gradient covering left ~55% of the slide
+    \fill[left color=CLSGradientBlue, right color=CLSGradientGreen]
+      (current page.north west) rectangle
+      ([xshift=0.55\paperwidth]current page.south west);
+
+    % Semi-transparent white overlay on the right to soften the edge
+    \fill[white, opacity=0.0]
+      ([xshift=0.50\paperwidth]current page.north west) rectangle
+      (current page.south east);
+
+    % CLS logo — top-left on the gradient
+    \node[anchor=north west, inner sep=0pt] (clslogo) at
+      ([xshift=0.9cm, yshift=-1.2cm]current page.north west)
+      {\includegraphics[height=1.5cm]{images/cls_logo.png}};
+
+    % Partner logos — right of CLS logo, top-aligned
+    \ifx\@partnerlogos\empty\else
+      \node[anchor=north west, inner sep=0pt] at (clslogo.north east)
+        {\@partnerlogos};
+    \fi
+
+    % Title — positioned on the left, vertically centered
+    \node[anchor=west, text width=0.48\paperwidth, align=left] at
+      ([xshift=1.3cm, yshift=0.3cm]current page.west)
+      {\usebeamerfont{title}\usebeamercolor[fg]{title}\inserttitle};
+
+    % Subtitle — below title
+    \node[anchor=west, text width=0.48\paperwidth, align=left] at
+      ([xshift=1.3cm, yshift=-0.6cm]current page.west)
+      {\usebeamerfont{subtitle}\usebeamercolor[fg]{subtitle}\insertsubtitle};
+
+    % Author — below subtitle
+    \node[anchor=west, text width=0.48\paperwidth, align=left] at
+      ([xshift=1.3cm, yshift=-1.4cm]current page.west)
+      {\usebeamerfont{author}\usebeamercolor[fg]{author}\insertauthor};
+
+    % Institute
+    \node[anchor=west, text width=0.48\paperwidth, align=left] at
+      ([xshift=1.3cm, yshift=-1.9cm]current page.west)
+      {\usebeamerfont{institute}\usebeamercolor[fg]{institute}\insertinstitute};
+
+    % Date
+    \node[anchor=west, text width=0.48\paperwidth, align=left] at
+      ([xshift=1.3cm, yshift=-2.3cm]current page.west)
+      {\usebeamerfont{date}\usebeamercolor[fg]{date}\insertdate};
+  \end{tikzpicture}
+}
+\makeatother
+
+% ---------------------------------------------------------------------------
+% Frame title template — clean white/light header bar
+% ---------------------------------------------------------------------------
+\setbeamertemplate{frametitle}{%
+  \nointerlineskip
+  \begin{beamercolorbox}[wd=\paperwidth, ht=1.2cm, dp=0.3cm, leftskip=0.6cm]{frametitle}
+    \usebeamerfont{frametitle}\insertframetitle%
+    \ifx\insertframesubtitle\empty\else\\[2pt]
+      \usebeamerfont{framesubtitle}\usebeamercolor[fg]{framesubtitle}\insertframesubtitle%
+    \fi
+  \end{beamercolorbox}%
+  % Thin gradient line under the header
+  \begin{tikzpicture}[remember picture, overlay]
+    \draw[left color=CLSGradientBlue, right color=CLSGradientGreen, line width=1.5pt]
+      ([yshift=-1.5cm]current page.north west) --
+      ([yshift=-1.5cm]current page.north east);
+  \end{tikzpicture}%
+}
+
+% ---------------------------------------------------------------------------
+% Footline template — gradient bar left, logo + page number right
+% ---------------------------------------------------------------------------
+\setbeamertemplate{footline}{%
+  \begin{tikzpicture}[remember picture, overlay]
+    % Gradient bar — bottom-left, half width, rounded
+    \fill[left color=CLSGradientBlue, right color=CLSGradientGreen,
+          rounded corners=2pt]
+      ([xshift=0cm, yshift=0cm]current page.south west) rectangle
+      ([xshift=0.52\paperwidth, yshift=0.45cm]current page.south west);
+
+    % CLS logo — bottom-right
+    \node[anchor=south east] at
+      ([xshift=-0.3cm, yshift=0.1cm]current page.south east)
+      {\includegraphics[height=0.9cm]{images/cls_logo.png}};
+
+    % Slide number — bottom-right, above logo area
+    \node[anchor=south east, font=\scriptsize, text=CLSDarkGray] at
+      ([xshift=-0.5cm, yshift=0.5cm]current page.south east)
+      {\insertframenumber\,/\,\inserttotalframenumber};
+  \end{tikzpicture}%
+}
+
+% ---------------------------------------------------------------------------
+% Section page template — for section dividers
+% ---------------------------------------------------------------------------
+\AtBeginSection[]{%
+  \begin{frame}[plain, noframenumbering]
+    \begin{tikzpicture}[remember picture, overlay]
+      % Top half: gradient background
+      \fill[left color=CLSGradientBlue, right color=CLSGradientGreen]
+        (current page.north west) rectangle
+        ([yshift=-0.5\paperheight]current page.north east);
+
+      % Section number — centered in top half
+      \node[font=\fontsize{60}{72}\selectfont\bfseries, text=white, opacity=0.3]
+        at ([yshift=0.25\paperheight]current page.center)
+        {\insertsectionnumber};
+
+      % Section title — centered
+      \node[font=\Large\bfseries, text=CLSBlue] at
+        ([yshift=-0.08\paperheight]current page.center)
+        {\insertsection};
+
+      % Decorative line
+      \draw[CLSTeal, line width=2pt]
+        ([xshift=-2cm, yshift=-0.15\paperheight]current page.center) --
+        ([xshift=2cm, yshift=-0.15\paperheight]current page.center);
+
+      % CLS logo — bottom-right
+      \node[anchor=south east] at
+        ([xshift=-0.3cm, yshift=0.1cm]current page.south east)
+        {\includegraphics[height=0.9cm]{images/cls_logo.png}};
+    \end{tikzpicture}
+  \end{frame}
+}
+
+% ---------------------------------------------------------------------------
+% Table of contents styling
+% ---------------------------------------------------------------------------
+\setbeamertemplate{section in toc}[circle]
+\setbeamertemplate{subsection in toc}[square]
+
+% ---------------------------------------------------------------------------
+% End of theme
+% ---------------------------------------------------------------------------
+\endinput

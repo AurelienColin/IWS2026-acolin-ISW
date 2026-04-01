@@ -1,0 +1,16 @@
+% Code block slide
+\begin{frame}[fragile]{Implementation Example}
+  \begin{lstlisting}[language=Python]
+import numpy as np
+from colloc_core.display import Display
+
+# Create wind speed visualization
+display = Display(subplot_size=(10, 8), projection='mercator')
+display.add_pcolormesh(
+    longitude, latitude, wind_speed_ms,
+    preset='wind_speed',
+)
+display.add_coastlines(resolution='10m')
+display.show()
+  \end{lstlisting}
+\end{frame}
