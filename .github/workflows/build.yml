@@ -2,26 +2,51 @@ name: Build LaTeX
 
 on:
   push:
-    branches: [main]
+    branches: [main, master, develop]
   pull_request:
-    branches: [main]
+    branches: [main, master]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - name: Install Tectonic
-        uses: WtfJoke/setup-tectonic@v3
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Tectonic
+        uses: wtfjoke/setup-tectonic@v3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build PDF
         run: make pdf
 
-      - name: Upload PDF
+      - name: Upload PDF artifact
         uses: actions/upload-artifact@v4
         with:
           name: pdf
           path: "*.pdf"
+          retention-days: 30
+
+      - name: Check for LaTeX errors
+        if: failure()
+        run: |
+          echo "::error::LaTeX compilation failed. Check logs above."
+          exit 1
+
+  validate-bibliography:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate bibliography
+        run: python scripts/validate_bib.py
