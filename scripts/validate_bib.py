@@ -11,14 +11,8 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import quote
 from urllib.request import Request, urlopen
 
-ENTRY_PATTERN: re.Pattern[str] = re.compile(
-    r"@(\w+)\{([^,]+),\s*(.*?)\n\}", re.DOTALL
-)
 FIELD_PATTERN: re.Pattern[str] = re.compile(
     r"(\w+)\s*=\s*\{([^}]*)\}", re.IGNORECASE
-)
-DOI_FIELD_PATTERN: re.Pattern[str] = re.compile(
-    r"doi\s*=\s*\{([^}]+)\}", re.IGNORECASE
 )
 
 REDIRECT_STATUS_CODES: tuple[int, ...] = (301, 302, 303, 307, 308)
@@ -26,17 +20,34 @@ HTTP_TIMEOUT_SECONDS: int = 15
 
 CHECKED_FIELDS: tuple[str, ...] = ("title", "author", "year", "journal", "volume", "pages")
 
+ENTRY_HEADER_PATTERN: re.Pattern[str] = re.compile(r"@(\w+)\{([^,]+),")
+
 
 def extract_entries(bib_text: str) -> list[dict[str, str]]:
+    bib_text = bib_text.replace("\r\n", "\n")
     entries: list[dict[str, str]] = []
-    for match in ENTRY_PATTERN.finditer(bib_text):
-        entry_type = match.group(1)
-        citation_key = match.group(2).strip()
-        body = match.group(3)
+    position = 0
+    while position < len(bib_text):
+        header_match = ENTRY_HEADER_PATTERN.search(bib_text, position)
+        if header_match is None:
+            break
+        entry_type = header_match.group(1)
+        citation_key = header_match.group(2).strip()
+        body_start = header_match.end()
+        brace_depth = 1
+        index = body_start
+        while index < len(bib_text) and brace_depth > 0:
+            if bib_text[index] == "{":
+                brace_depth += 1
+            elif bib_text[index] == "}":
+                brace_depth -= 1
+            index += 1
+        body = bib_text[body_start:index - 1]
         fields: dict[str, str] = {"_type": entry_type, "_key": citation_key}
         for field_match in FIELD_PATTERN.finditer(body):
             fields[field_match.group(1).lower()] = field_match.group(2).strip()
         entries.append(fields)
+        position = index
     return entries
 
 
@@ -63,15 +74,16 @@ def check_key_is_lowercase_doi(entries: list[dict[str, str]]) -> list[str]:
     return errors
 
 
-def resolve_doi(doi: str) -> bool:
+def resolve_doi(doi: str) -> tuple[bool, str]:
     url_path = "/" + quote(doi, safe="/:.()-")
     connection = HTTPSConnection("doi.org", timeout=HTTP_TIMEOUT_SECONDS)
     try:
         connection.request("HEAD", url_path)
         response = connection.getresponse()
-        return response.status in REDIRECT_STATUS_CODES
-    except (OSError, TimeoutError, HTTPException):
-        return False
+        is_valid = response.status in REDIRECT_STATUS_CODES
+        return is_valid, f"HTTP {response.status}"
+    except (OSError, TimeoutError, HTTPException) as error:
+        return False, f"Network error: {error}"
     finally:
         connection.close()
 
@@ -82,14 +94,15 @@ def check_doi_resolves(entries: list[dict[str, str]]) -> list[str]:
         doi = entry.get("doi")
         if doi is None:
             continue
-        if not resolve_doi(doi):
-            errors.append(f"[{entry['_key']}] DOI does not resolve: {doi}")
+        is_valid, detail = resolve_doi(doi)
+        if not is_valid:
+            errors.append(f"[{entry['_key']}] DOI does not resolve: {doi} ({detail})")
         else:
             print(f"  OK: {doi}")
     return errors
 
 
-def fetch_crossref_metadata(doi: str) -> dict[str, str] | None:
+def fetch_crossref_metadata(doi: str) -> tuple[dict[str, str] | None, str]:
     url = f"https://api.crossref.org/works/{quote(doi, safe='')}"
     request = Request(url, headers={"Accept": "application/json"})
     try:
@@ -115,9 +128,9 @@ def fetch_crossref_metadata(doi: str) -> dict[str, str] | None:
             metadata["journal"] = container[0]
         metadata["volume"] = message.get("volume", "")
         metadata["pages"] = message.get("page", "")
-        return metadata
-    except (HTTPError, URLError, TimeoutError, OSError, json.JSONDecodeError):
-        return None
+        return metadata, "ok"
+    except (HTTPError, URLError, TimeoutError, OSError, json.JSONDecodeError) as error:
+        return None, f"Crossref fetch failed: {error}"
 
 
 def normalize_for_comparison(text: str) -> str:
@@ -132,10 +145,10 @@ def check_fields_match_doi(entries: list[dict[str, str]]) -> list[str]:
         doi = entry.get("doi")
         if doi is None:
             continue
-        crossref = fetch_crossref_metadata(doi)
+        crossref, error_detail = fetch_crossref_metadata(doi)
         if crossref is None:
             warnings.append(
-                f"[{entry['_key']}] Could not fetch Crossref metadata for {doi}"
+                f"[{entry['_key']}] {error_detail} for {doi}"
             )
             continue
         for field in CHECKED_FIELDS:
@@ -150,20 +163,18 @@ def check_fields_match_doi(entries: list[dict[str, str]]) -> list[str]:
                     f"[{entry['_key']}] Missing field '{field}' "
                     f"(Crossref: {crossref_value[:60]})"
                 )
-            elif bib_normalized and crossref_normalized:
-                if field == "year":
-                    if bib_normalized != crossref_normalized:
-                        warnings.append(
-                            f"[{entry['_key']}] Field 'year' mismatch: "
-                            f"bib={bib_value}, Crossref={crossref_value}"
-                        )
+            elif bib_normalized != crossref_normalized:
+                warnings.append(
+                    f"[{entry['_key']}] Field '{field}' mismatch: "
+                    f"bib='{bib_value[:40]}' vs Crossref='{crossref_value[:40]}'"
+                )
     return warnings
 
 
 def main() -> int:
     bib_files = sorted(Path(".").glob("**/*.bib"))
     if not bib_files:
-        print("No .bib files found — skipping DOI validation.")
+        print("No .bib files found -- skipping DOI validation.")
         return 0
 
     all_errors: list[str] = []
