@@ -180,6 +180,10 @@
     \draw[left color=CLSGradientBlue, right color=CLSGradientGreen, line width=1.5pt]
       ([yshift=-1.5cm]current page.north west) --
       ([yshift=-1.5cm]current page.north east);
+    % CLS logo — top-right corner
+    \node[anchor=north east, inner sep=0pt] at
+      ([xshift=-0.3cm, yshift=-0.15cm]current page.north east)
+      {\includegraphics[height=0.9cm]{images/cls_logo.png}};
   \end{tikzpicture}%
 }
 
@@ -194,14 +198,14 @@
       ([xshift=0cm, yshift=0cm]current page.south west) rectangle
       ([xshift=0.52\paperwidth, yshift=0.45cm]current page.south west);
 
-    % CLS logo — bottom-right
-    \node[anchor=south east] at
-      ([xshift=-0.3cm, yshift=0.1cm]current page.south east)
-      {\includegraphics[height=0.9cm]{images/cls_logo.png}};
+    % Presentation title and date — inside the gradient bar, bottom-left
+    \node[anchor=west, font=\tiny, text=CLSWhite] at
+      ([xshift=0.3cm, yshift=0.22cm]current page.south west)
+      {\inserttitle{} -- \insertdate};
 
-    % Slide number — bottom-right, above logo area
+    % Slide number — bottom-right
     \node[anchor=south east, font=\scriptsize, text=CLSDarkGray] at
-      ([xshift=-0.5cm, yshift=0.5cm]current page.south east)
+      ([xshift=-0.5cm, yshift=0.15cm]current page.south east)
       {\insertframenumber\,/\,\inserttotalframenumber};
   \end{tikzpicture}%
 }

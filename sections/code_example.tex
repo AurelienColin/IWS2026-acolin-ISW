@@ -1,16 +1,11 @@
 % Code block slide
-\begin{frame}[fragile]{Implementation Example}
+\begin{frame}[fragile]{Code Example}
   \begin{lstlisting}[language=Python]
-import numpy as np
-from colloc_core.display import Display
+def greet(name: str) -> str:
+    """Return a greeting message."""
+    return f"Hello, {name}!"
 
-# Create wind speed visualization
-display = Display(subplot_size=(10, 8), projection='mercator')
-display.add_pcolormesh(
-    longitude, latitude, wind_speed_ms,
-    preset='wind_speed',
-)
-display.add_coastlines(resolution='10m')
-display.show()
+for i in range(5):
+    print(greet(f"User {i}"))
   \end{lstlisting}
 \end{frame}
