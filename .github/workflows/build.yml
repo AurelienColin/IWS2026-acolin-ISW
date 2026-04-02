@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Setup Tectonic
         uses: wtfjoke/setup-tectonic@v3
@@ -42,6 +44,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -49,4 +53,4 @@ jobs:
           python-version: "3.12"
 
       - name: Validate bibliography
-        run: python scripts/validate_bib.py
+        run: python template/scripts/validate_bib.py
